@@ -1,5 +1,8 @@
 from gpiozero import LED, OutputDevice
 from time import sleep
+import cv2
+import urllib.request
+import numpy as np
 
 
 # pins
@@ -22,6 +25,13 @@ r4 = OutputDevice(step_motor_pin_4)
 
 flashlight = OutputDevice(flashlight_pin)
 water_pump = OutputDevice(water_pump_pin)
+
+''' image sending '''
+url='http://10.42.0.35/cam-hi.jpg' # CHANGE TO ACTUAL IP
+cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
+count=0
+
+
     
 def delay_step():
     sleep(us_delay / 1000000)
@@ -64,6 +74,20 @@ def get_water(){
     water_pump.off()
 }
 
+def get_image(){
+    img_resp=urllib.request.urlopen(url)	# get image from url
+    imgnp=np.array(bytearray(img_resp.read()),dtype=np.uint8)
+    frame=cv2.imdecode(imgnp,-1)
+    
+    cv2.imshow("live transmission", frame)
+    
+    key=cv2.waitKey(1000)		# wait 1000 ms
+    count+=1
+    
+    t=str(count)+'.png'		# name of image
+    cv2.imwrite(t,frame)	# save image frame
+    print("image saved as: "+t)
+}
 
     
             
