@@ -4,7 +4,7 @@ import numpy as np
 import time
 
  
-url='	http://10.42.0.35/cam-hi.jpg'
+url='http://10.42.0.35/cam-hi.jpg'
 cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
  
 count=0
