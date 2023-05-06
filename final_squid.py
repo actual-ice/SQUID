@@ -1,14 +1,27 @@
 from gpiozero import LED, OutputDevice
 from time import sleep
 
+
+# pins
+step_motor_pin_1 = 17
+step_motor_pin_2 = 27
+step_motor_pin_3 = 22
+step_motor_pin_4 = 10
+
+flashlight_pin = 23
+water_pump_pin = 24
+
 us_delay = 9000     # delay between each step in microseconds
 step_per_revo = 2048 # number of half steps per 1 revolution
 
 ''' stepper motor '''
-r1 = OutputDevice(17) 
-r2 = OutputDevice(27)
-r3 = OutputDevice(22)
-r4 = OutputDevice(10)
+r1 = OutputDevice(step_motor_pin_1) 
+r2 = OutputDevice(step_motor_pin_2)
+r3 = OutputDevice(step_motor_pin_3)
+r4 = OutputDevice(step_motor_pin_4)
+
+flashlight = OutputDevice(flashlight_pin)
+water_pump = OutputDevice(water_pump_pin)
     
 def delay_step():
     sleep(us_delay / 1000000)
@@ -35,6 +48,21 @@ def step_move(degree):
         step.off()
     return
 
+def flashlight_power(status){
+    # status = bool
+    if status:
+        flashlight.on()
+    elif not status:
+        flashlight.off()
+    return
+}
+
+def get_water(){
+    pump_duration = 2 # two seconds
+    water_pump.on()
+    sleep(pump_duration)
+    water_pump.off()
+}
 
 
     
