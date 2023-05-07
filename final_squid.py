@@ -10,6 +10,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
+import gsm_pi
 
 # pins
 step_motor_pin_1 = 17
@@ -64,24 +65,24 @@ def step_move(degree):
         step.off()
     return
 
-def flashlight_power(status){
+def flashlight_power(status):
     # status = bool
     if status:
         flashlight.on()
     elif not status:
         flashlight.off()
     return
-}
 
-def get_water(){
+
+def get_water():
     pump_duration = 2 # two seconds
     water_pump.on()
     sleep(pump_duration)
     water_pump.off()
     return
-}
 
-def get_image(){
+
+def get_image():
     img_resp=urllib.request.urlopen(url)	# get image from url
     imgnp=np.array(bytearray(img_resp.read()),dtype=np.uint8)
     frame=cv2.imdecode(imgnp,-1)
@@ -95,7 +96,7 @@ def get_image(){
     cv2.imwrite(t,frame)	# save image frame
     print("image saved as: "+t)
     return
-}
+
 
 def mp_act(img_count):
     # img_count = int, refers to image name       
@@ -183,8 +184,9 @@ def mp_act(img_count):
             
 if __name__ == "__main__":
     get_water()
-    flashlight_power()
+    flashlight_power(True)
     get_image()
+    flashlight_power(False)
     mp_act()
 
         
