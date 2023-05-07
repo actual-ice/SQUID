@@ -78,6 +78,7 @@ def get_water(){
     water_pump.on()
     sleep(pump_duration)
     water_pump.off()
+    return
 }
 
 def get_image(){
@@ -93,6 +94,7 @@ def get_image(){
     t=str(count)+'.png'		# name of image
     cv2.imwrite(t,frame)	# save image frame
     print("image saved as: "+t)
+    return
 }
 
 def mp_act(img_count):
@@ -175,10 +177,15 @@ def mp_act(img_count):
     ax.imshow(im)                   # Display the image
     plt.show()
 
+    return
+
+
             
 if __name__ == "__main__":
-    step_move(-5)
-    print("hello world")
+    get_water()
+    flashlight_power()
+    get_image()
+    mp_act()
 
         
     
