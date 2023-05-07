@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
 import gsm_pi
+import serial
 
 # pins
 step_motor_pin_1 = 17
@@ -35,7 +36,7 @@ water_pump = OutputDevice(water_pump_pin)
 
 ''' image sending '''
 url='http://10.42.0.35/cam-hi.jpg' # CHANGE TO ACTUAL IP
-cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
+# cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
 count=0
 
 
@@ -89,7 +90,7 @@ def get_image():
     
     cv2.imshow("live transmission", frame)
     
-    key=cv2.waitKey(1000)		# wait 1000 ms
+    key=cv2.waitKey(1)		# wait 1000 ms
     count+=1
     
     t=str(count)+'.png'		# name of image
@@ -101,61 +102,62 @@ def get_image():
 def mp_act(img_count):
     # img_count = int, refers to image name       
     ij = imagej.init('sc.fiji:fiji')
-    img_name = str(img_count) + ".png"
+    # img_name = str(img_count) + ".png"
+    img_name = "1.tiff"
     macro = """
-    #@ String name
-    //MP-ACT (Microplastics Automated Counting Tool) v1.0
-    //Created by J.C.Prata, V. Reis, J. Matos, J.P.da Costa, A.Duarte, T.Rocha-Santos 2019
+#@ String name
+//MP-ACT (Microplastics Automated Counting Tool) v1.0
+//Created by J.C.Prata, V. Reis, J. Matos, J.P.da Costa, A.Duarte, T.Rocha-Santos 2019
 
-    macro "MPACT Action Tool - Cd61D32D72D92Da2Db2Dc2D33D43D63D73D93Dd3D34D54D74D94Dd4D35D55D75D95Da5Db5Dc5D36D76D96D37D77D97D3aD4aD5aD7aD8aD9aDbaDcaDdaD3bD5bD7bDcbD3cD4cD5cD7cDccD3dD5dD7dDcdD3eD5eD7eD8eD9eDce"{
+macro "MPACT Action Tool - Cd61D32D72D92Da2Db2Dc2D33D43D63D73D93Dd3D34D54D74D94Dd4D35D55D75D95Da5Db5Dc5D36D76D96D37D77D97D3aD4aD5aD7aD8aD9aDbaDcaDdaD3bD5bD7bDcbD3cD4cD5cD7cDccD3dD5dD7dDcdD3eD5eD7eD8eD9eDce"{
 
-    open(name);
-    //8-bit conversion and automatic threshold
+open(name);
+//8-bit conversion and automatic threshold
 
-    run("Invert");
-    run("8-bit");
+run("Invert");
+run("8-bit");
 
-    run("Threshold...");
-    setThreshold(0,150);
-    setOption("BlackBackground", false);
-    run("Convert to Mask");
-    run("Set Measurements...", "area shape feret's display redirect=None decimal=3");
+run("Threshold...");
+setThreshold(0,150);
+setOption("BlackBackground", false);
+run("Convert to Mask");
+run("Set Measurements...", "area shape feret's display redirect=None decimal=3");
 
-    //title
-    title = getTitle();
-    setBatchMode(true);
-    mpshape = newArray ("Fibers", "Fragments", "Particles");
-    for (i = 0; i < mpshape.length; i++) {
-        selectWindow(title);
-        run("Duplicate...", " ");
-        rename(mpshape[i]);
-    }
-    run("Tile");
+//title
+title = getTitle();
+setBatchMode(true);
+mpshape = newArray ("Fibers", "Fragments", "Particles");
+for (i = 0; i < mpshape.length; i++) {
+selectWindow(title);
+run("Duplicate...", " ");
+rename(mpshape[i]);
+}
+run("Tile");
 
-    //Analyze Fibers
-    selectWindow(mpshape[0]);
-    run("Analyze Particles...", "size=3-1000000 pixel circularity=0.0-0.3 display");
+//Analyze Fibers
+selectWindow(mpshape[0]);
+run("Analyze Particles...", "size=3-1000000 pixel circularity=0.0-0.3 display");
 
-    //Analyze Fragments
-    selectWindow(mpshape[1]);
-    run("Analyze Particles...", "size=3-1000000 pixel circularity=0.3-0.6 display");
+//Analyze Fragments
+selectWindow(mpshape[1]);
+run("Analyze Particles...", "size=3-1000000 pixel circularity=0.3-0.6 display");
 
-    //Analyze Particles
-    selectWindow(mpshape[2]);
-    run("Analyze Particles...", "size=3-1000000 pixel circularity=0.6-1.0 display");
+//Analyze Particles
+selectWindow(mpshape[2]);
+run("Analyze Particles...", "size=3-1000000 pixel circularity=0.6-1.0 display");
 
-    //Get results and save to excel
-    for (i = 0; i < mpshape.length; i++) {
-        close(mpshape[i]);
-    }
-    run("Original Scale");
+//Get results and save to excel
+for (i = 0; i < mpshape.length; i++) {
+    close(mpshape[i]);
+}
+run("Original Scale");
 
-    dir = File.directory; 
-    name = File.nameWithoutExtension; 
-    saveAs("results",  name + "_act2_results.csv"); 
+dir = File.directory; 
+name = File.nameWithoutExtension; 
+saveAs("results",  name + "_act2_results.csv"); 
 
-    }
-    """
+}
+"""
 
     args =  {'name':img_name}
     image = ij.io().open(img_name)
@@ -180,14 +182,34 @@ def mp_act(img_count):
 
     return
 
+ser = serial.Serial('/dev/serial0')
+def SIM800(command):
+    AT_command = command + "\r\n"
+    ser.write(str(AT_command).encode('ascii'))
+    sleep(1)
+    if ser.inWaiting() > 0:
+        echo = ser.readline() #waste the echo
+        response_byte = ser.readline()
+        response_str = response_byte.decode('ascii')
+        return (response_str)
+    else:
+        return ("ERROR")
 
+def send_msg(message):
+    # message = string
+    ser.write(str('AT+CMGS="+639273235505"\r\n').encode('ascii'))
+    sleep(1) # VERY IMPORTANT
+    print(SIM800(message + "\x1A\r\n"))
+    
             
 if __name__ == "__main__":
-    get_water()
-    flashlight_power(True)
-    get_image()
-    flashlight_power(False)
-    mp_act()
+    #get_water()
+    #flashlight_power(True)
+    #get_image()
+    #print("bruh")
+    #flashlight_power(False)
+    mp_act(1)
+    send_msg("test")
 
         
     
