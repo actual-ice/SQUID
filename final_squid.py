@@ -103,7 +103,7 @@ def mp_act(img_count):
     # img_count = int, refers to image name       
     ij = imagej.init('sc.fiji:fiji')
     # img_name = str(img_count) + ".png"
-    img_name = "1.tiff"
+    img_name = str(img_count) + ".tiff"
     macro = """
 #@ String name
 //MP-ACT (Microplastics Automated Counting Tool) v1.0
