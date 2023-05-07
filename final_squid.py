@@ -36,7 +36,7 @@ flashlight = OutputDevice(flashlight_pin)
 water_pump = OutputDevice(water_pump_pin)
 
 ''' image sending '''
-url='http://10.42.0.35/cam-hi.jpg' # CHANGE TO ACTUAL IP
+url='http://192.168.68.123/cam-hi.jpg' # CHANGE TO ACTUAL IP
 # cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
 count=0
 
@@ -84,15 +84,15 @@ def get_water():
     return
 
 
-def get_image():
+def get_image(count):
     img_resp=urllib.request.urlopen(url)	# get image from url
     imgnp=np.array(bytearray(img_resp.read()),dtype=np.uint8)
     frame=cv2.imdecode(imgnp,-1)
     
-    cv2.imshow("live transmission", frame)
+    # cv2.imshow("live transmission", frame)
     
     key=cv2.waitKey(1)		# wait 1000 ms
-    count+=1
+    # count+=1
     
     t=str(count)+'.png'		# name of image
     cv2.imwrite(t,frame)	# save image frame
@@ -104,7 +104,7 @@ def mp_act(img_count):
     # img_count = int, refers to image name       
     ij = imagej.init('sc.fiji:fiji')
     # img_name = str(img_count) + ".png"
-    img_name = str(img_count) + ".tiff"
+    img_name = str(img_count) + ".png"
     macro = """
 #@ String name
 //MP-ACT (Microplastics Automated Counting Tool) v1.0
@@ -164,7 +164,7 @@ saveAs("results",  name + "_act2_results.csv");
     image = ij.io().open(img_name)
 
     ij.py.run_script("ijm",macro,args)
-    ij.py.show(image)
+    # ij.py.show(image)
 
     result_name = os.path.splitext(args['name'])[0] + "_act2_results.csv"
     print(result_name)
@@ -173,15 +173,15 @@ saveAs("results",  name + "_act2_results.csv");
     print(ferets)
 
     # display image
-    im = Image.open(img_name)
+    #im = Image.open(img_name)
     fig, ax = plt.subplots()        # Create figure and axes
     for index, row in ferets.iterrows():
         rect = patches.Rectangle((row['FeretX']-3.6, row['FeretY']-3.6), 10, 10, linewidth=1, edgecolor='r', facecolor='none')
         ax.add_patch(rect)
-    ax.imshow(im)                   # Display the image
-    plt.show()
+    # ax.imshow(im)                   # Display the image
+    # plt.show()
 
-    return
+    return (data.shape[0], (data["Label"]=='Fibers').sum(), (data["Label"]=='Fragments').sum(), (data["Label"]=='Particles').sum())
 
 ser = serial.Serial('/dev/serial0')
 def SIM800(command):
@@ -201,19 +201,22 @@ def send_msg(message):
     print(SIM800("AT+CMGF=1"))
     ser.write(str('AT+CMGS="+639273235505"\r\n').encode('ascii'))
     sleep(1) # VERY IMPORTANT
-    print(SIM800("test\x1A\r\n"))
+    print(SIM800(message + "\x1A\r\n"))
     return
     
             
 if __name__ == "__main__":
-    #get_water()
-    #flashlight_power(True)
-    #get_image()
-    #print("bruh")
-    #flashlight_power(False)
-    #mp_act(1)
-    #sleep(3)
-    send_msg("test")
+    get_water()
+    flashlight_power(True)
+    count+=1
+    get_image(count)
+    flashlight_power(False)
+    mp_count = mp_act(count)
+    sleep(3)
+    send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
+             + str(mp_count[1]) + " Fibers, " \
+             + str(mp_count[2]) + " Fragments, " \
+             + str(mp_count[3]) + " Particles, ")
    
 
 
