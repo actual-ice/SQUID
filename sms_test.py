@@ -40,5 +40,8 @@ def SIM800(command):
     else:
         return ("ERROR")
     
-ser.write('AT+CMGS="+33612345678"\r\n'.encode('ascii'))
+ser.write(str('AT+CMGS="+639273235505"\r\n').encode('ascii'))
+# ser.write(str('testingg\x1A\r\n').encode('ascii'))
+time.sleep(1)
+# print(SIM800('AT+CMGS="+639273235505"'))
 print(SIM800("testingg\x1A\r\n"))
