@@ -12,6 +12,7 @@ import matplotlib.patches as patches
 from PIL import Image
 import gsm_pi
 import serial
+import time
 
 # pins
 step_motor_pin_1 = 17
@@ -19,7 +20,7 @@ step_motor_pin_2 = 27
 step_motor_pin_3 = 22
 step_motor_pin_4 = 10
 
-flashlight_pin = 23
+flashlight_pin = 12
 water_pump_pin = 24
 
 us_delay = 9000     # delay between each step in microseconds
@@ -197,9 +198,11 @@ def SIM800(command):
 
 def send_msg(message):
     # message = string
+    print(SIM800("AT+CMGF=1"))
     ser.write(str('AT+CMGS="+639273235505"\r\n').encode('ascii'))
     sleep(1) # VERY IMPORTANT
-    print(SIM800(message + "\x1A\r\n"))
+    print(SIM800("test\x1A\r\n"))
+    return
     
             
 if __name__ == "__main__":
@@ -208,8 +211,11 @@ if __name__ == "__main__":
     #get_image()
     #print("bruh")
     #flashlight_power(False)
-    mp_act(1)
+    #mp_act(1)
+    #sleep(3)
     send_msg("test")
+   
+
 
         
     
