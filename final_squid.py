@@ -38,6 +38,13 @@ water_pump = OutputDevice(water_pump_pin)
 ''' image sending '''
 url='http://10.42.0.35/cam-hi.jpg' # CHANGE TO ACTUAL IP
 # cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
+
+
+''' mpact '''
+# img_count = int, refers to image name       
+ij = imagej.init('sc.fiji:fiji')
+# img_name = str(img_count) + ".png"
+
 count=0
 
 
@@ -101,10 +108,7 @@ def get_image(count):
 
 
 def mp_act(img_count):
-    # img_count = int, refers to image name       
-    ij = imagej.init('sc.fiji:fiji')
-    # img_name = str(img_count) + ".png"
-    img_name = str(img_count) + ".png"
+    
     macro = """
 #@ String name
 //MP-ACT (Microplastics Automated Counting Tool) v1.0
@@ -159,12 +163,17 @@ saveAs("results",  name + "_act2_results.csv");
 
 }
 """
-
-    args =  {'name':img_name}
+    # img_count = int, refers to image name       
+    img_name = str(img_count) + ".png"
+    
+    args = {}
+    args = {'name':img_name}
     image = ij.io().open(img_name)
 
     ij.py.run_script("ijm",macro,args)
     # ij.py.show(image)
+    macro = """ """
+    ij.py.run_script("ijm",macro,args)
 
     result_name = os.path.splitext(args['name'])[0] + "_act2_results.csv"
     print(result_name)
@@ -206,17 +215,22 @@ def send_msg(message):
     
             
 if __name__ == "__main__":
-     get_water(True)
-     sleep(2)
-     get_water(False)
-     flashlight_power(True)
-     sleep(5)
+#      get_water(True)
+#      sleep(2)
+#      get_water(False)
+#      
+#      flashlight_power(True)
+#      sleep(5)
      count+=1
-     get_image(count)
-     flashlight_power(False)
+#      get_image(count)
+#      flashlight_power(False)
+#      sleep(5)
      mp_count = mp_act(count)
-     sleep(3)
-     send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
-              + str(mp_count[1]) + " Fibers, " \
-              + str(mp_count[2]) + " Fragments, " \
-              + str(mp_count[3]) + " Particles, ")
+     mp_bleh = mp_act(count)
+     
+     
+
+#      send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
+#             + str(mp_count[1]) + " Fibers, " \
+#             + str(mp_count[2]) + " Fragments, " \
+#             + str(mp_count[3]) + " Particles, ")
