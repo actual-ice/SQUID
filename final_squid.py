@@ -36,7 +36,7 @@ flashlight = OutputDevice(flashlight_pin)
 water_pump = OutputDevice(water_pump_pin)
 
 ''' image sending '''
-url='http://192.168.68.123/cam-hi.jpg' # CHANGE TO ACTUAL IP
+url='http://10.42.0.35/cam-hi.jpg' # CHANGE TO ACTUAL IP
 # cv2.namedWindow("live transmission", cv2.WINDOW_AUTOSIZE)
 count=0
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
      flashlight_power(True)
      sleep(5)
      count+=1
-     #get_image(count)
+     get_image(count)
      flashlight_power(False)
      mp_count = mp_act(count)
      sleep(3)
