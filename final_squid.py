@@ -215,22 +215,19 @@ def send_msg(message):
     
             
 if __name__ == "__main__":
-#      get_water(True)
-#      sleep(2)
-#      get_water(False)
-#      
-#      flashlight_power(True)
-#      sleep(5)
      count+=1
-#      get_image(count)
-#      flashlight_power(False)
-#      sleep(5)
-     mp_count = mp_act(count)
-     mp_bleh = mp_act(count)
-     
-     
-
-#      send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
-#             + str(mp_count[1]) + " Fibers, " \
-#             + str(mp_count[2]) + " Fragments, " \
-#             + str(mp_count[3]) + " Particles, ")
+     get_water(True)
+     sleep(2)
+     get_water(False)
+     for i in range(1,4):
+         img_name = str(count) + "_" + str(i)
+         flashlight_power(True)
+         sleep(5)
+         get_image(img_name)
+         flashlight_power(False)
+         sleep(5)
+         mp_count = mp_act(img_name)    
+         send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
+                + str(mp_count[1]) + " Fibers, " \
+                + str(mp_count[2]) + " Fragments, " \
+                + str(mp_count[3]) + " Particles, ")
