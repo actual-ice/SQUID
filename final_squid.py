@@ -15,22 +15,22 @@ import serial
 import time
 
 # pins
-step_motor_pin_1 = 17
-step_motor_pin_2 = 27
-step_motor_pin_3 = 22
-step_motor_pin_4 = 10
+# step_motor_pin_1 = 17
+# step_motor_pin_2 = 27
+# step_motor_pin_3 = 22
+# step_motor_pin_4 = 10
 
 flashlight_pin = 12
-water_pump_pin = 24
+water_pump_pin = 17
 
 us_delay = 9000     # delay between each step in microseconds
 step_per_revo = 2048 # number of half steps per 1 revolution
 
 ''' stepper motor '''
-r1 = OutputDevice(step_motor_pin_1) 
-r2 = OutputDevice(step_motor_pin_2)
-r3 = OutputDevice(step_motor_pin_3)
-r4 = OutputDevice(step_motor_pin_4)
+# r1 = OutputDevice(step_motor_pin_1) 
+# r2 = OutputDevice(step_motor_pin_2)
+# r3 = OutputDevice(step_motor_pin_3)
+# r4 = OutputDevice(step_motor_pin_4)
 
 flashlight = OutputDevice(flashlight_pin)
 water_pump = OutputDevice(water_pump_pin)
@@ -71,17 +71,17 @@ def flashlight_power(status):
     # status = bool
     if status:
         flashlight.on()
-    elif not status:
+    else:
         flashlight.off()
     return
 
 
-def get_water():
-    pump_duration = 2 # two seconds
-    water_pump.on()
-    sleep(pump_duration)
-    water_pump.off()
-    return
+def get_water(status):
+    # somehow the inputs are flipped, on = off, off = on, possibly due to the pin
+    if not status:
+        water_pump.on()
+    else:
+        water_pump.off()
 
 
 def get_image(count):
@@ -206,26 +206,17 @@ def send_msg(message):
     
             
 if __name__ == "__main__":
-    get_water()
-    flashlight_power(True)
-    count+=1
-    get_image(count)
-    flashlight_power(False)
-    mp_count = mp_act(count)
-    sleep(3)
-    send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
-             + str(mp_count[1]) + " Fibers, " \
-             + str(mp_count[2]) + " Fragments, " \
-             + str(mp_count[3]) + " Particles, ")
-   
-
-
-        
-    
-    
-        
-
-        
-        
-
-
+     get_water(True)
+     sleep(2)
+     get_water(False)
+     flashlight_power(True)
+     sleep(5)
+     count+=1
+     #get_image(count)
+     flashlight_power(False)
+     mp_count = mp_act(count)
+     sleep(3)
+     send_msg("there are " + str(mp_count[0]) + " microplastics in this sample, " \
+              + str(mp_count[1]) + " Fibers, " \
+              + str(mp_count[2]) + " Fragments, " \
+              + str(mp_count[3]) + " Particles, ")
