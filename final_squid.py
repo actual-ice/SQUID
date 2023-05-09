@@ -221,7 +221,7 @@ if __name__ == "__main__":
      sleep(1)
      get_water(False)
 
-     for i in range(1,4):
+     for i in range(1,6):
          img_name = str(count) + "_" + str(i)
          flashlight_power(True)
          sleep(5)
