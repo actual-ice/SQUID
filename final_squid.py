@@ -34,6 +34,7 @@ step_per_revo = 2048 # number of half steps per 1 revolution
 
 flashlight = OutputDevice(flashlight_pin)
 water_pump = OutputDevice(water_pump_pin)
+water_pump.on()
 
 ''' image sending '''
 url='http://10.42.0.35/cam-hi.jpg' # CHANGE TO ACTUAL IP
@@ -217,8 +218,9 @@ def send_msg(message):
 if __name__ == "__main__":
      count+=1
      get_water(True)
-     sleep(2)
+     sleep(1)
      get_water(False)
+
      for i in range(1,4):
          img_name = str(count) + "_" + str(i)
          flashlight_power(True)
@@ -231,3 +233,4 @@ if __name__ == "__main__":
                 + str(mp_count[1]) + " Fibers, " \
                 + str(mp_count[2]) + " Fragments, " \
                 + str(mp_count[3]) + " Particles, ")
+ 
