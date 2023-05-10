@@ -188,8 +188,8 @@ saveAs("results",  name + "_act2_results.csv");
     for index, row in ferets.iterrows():
         rect = patches.Rectangle((row['FeretX']-3.6, row['FeretY']-3.6), 10, 10, linewidth=1, edgecolor='r', facecolor='none')
         ax.add_patch(rect)
-    # ax.imshow(im)                   # Display the image
-    # plt.show()
+    ax.imshow(im)                   # Display the image
+    plt.show()
 
     return (data.shape[0], (data["Label"]=='Fibers').sum(), (data["Label"]=='Fragments').sum(), (data["Label"]=='Particles').sum())
 
@@ -209,19 +209,21 @@ def SIM800(command):
 def send_msg(message):
     # message = string
     print(SIM800("AT+CMGF=1"))
-    ser.write(str('AT+CMGS="+639273235505"\r\n').encode('ascii'))
+    ser.write(str('AT+CMGS="+639279977811"\r\n').encode('ascii'))
     sleep(1) # VERY IMPORTANT
     print(SIM800(message + "\x1A\r\n"))
     return
     
             
 if __name__ == "__main__":
+
      count+=1
      get_water(True)
      sleep(1)
      get_water(False)
 
      for i in range(1,6):
+         sleep(600) # wait 10 minutes
          img_name = str(count) + "_" + str(i)
          flashlight_power(True)
          sleep(5)
