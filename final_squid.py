@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
      count+=1
      get_water(True)
-     sleep(1)
+     sleep(4)
      get_water(False)
 
      for i in range(1,6):
